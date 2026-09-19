@@ -194,6 +194,39 @@ def seed_database(db: Session):
     for role, order, title, sk, act, desc, dur, st in nodes:
         db.add(CareerRoadmapNode(employee_id=priya.id, target_role=role, step_order=order, title=title, skill_name=sk, activity_type=act, description=desc, estimated_duration=dur, status=st))
 
+    # 9. Add Initial TalentSync Updates for Priya
+    sync1 = TalentSyncUpdate(
+        employee_id=priya.id,
+        source="GitHub",
+        detected_type="skill",
+        update_title="Skill: XGBoost Classifier",
+        update_details_json=json.dumps({"skill_name": "XGBoost", "category": "AI/ML"}),
+        confidence=94.0,
+        evidence_json=json.dumps(["XGBoost classifier used in Fraud Detection System repository", "High-frequency commit activity in Python model training script"]),
+        status="PENDING"
+    )
+    sync2 = TalentSyncUpdate(
+        employee_id=priya.id,
+        source="Resume",
+        detected_type="skill",
+        update_title="Skill: Data Engineering",
+        update_details_json=json.dumps({"skill_name": "Data Engineering", "category": "Data"}),
+        confidence=87.0,
+        evidence_json=json.dumps(["Extracted from updated PDF resume section 'Database Pipelines'", "Automated SQL ETL script detection"]),
+        status="PENDING"
+    )
+    sync3 = TalentSyncUpdate(
+        employee_id=priya.id,
+        source="GitHub",
+        detected_type="skill",
+        update_title="Skill: PyTorch Deep Learning",
+        update_details_json=json.dumps({"skill_name": "PyTorch", "category": "AI/ML"}),
+        confidence=91.0,
+        evidence_json=json.dumps(["PyTorch neural network modules detected in personal computer vision repository"]),
+        status="APPROVED"
+    )
+    db.add_all([sync1, sync2, sync3])
+
     db.commit()
     print("[Database] Seeding complete with Demo User Credentials!")
 
@@ -217,5 +250,31 @@ def _ensure_demo_users(db: Session):
             hashed_password=hash_password("HR@123"),
             role="HR_ADMIN"
         ))
+
+    priya = db.query(Employee).first()
+    if priya:
+        existing_syncs = db.query(TalentSyncUpdate).filter(TalentSyncUpdate.employee_id == priya.id).count()
+        if existing_syncs == 0:
+            s1 = TalentSyncUpdate(
+                employee_id=priya.id,
+                source="GitHub",
+                detected_type="skill",
+                update_title="Skill: XGBoost Classifier",
+                update_details_json=json.dumps({"skill_name": "XGBoost", "category": "AI/ML"}),
+                confidence=94.0,
+                evidence_json=json.dumps(["XGBoost classifier used in Fraud Detection System repository", "High-frequency commit activity in Python model training script"]),
+                status="PENDING"
+            )
+            s2 = TalentSyncUpdate(
+                employee_id=priya.id,
+                source="Resume",
+                detected_type="skill",
+                update_title="Skill: Data Engineering",
+                update_details_json=json.dumps({"skill_name": "Data Engineering", "category": "Data"}),
+                confidence=87.0,
+                evidence_json=json.dumps(["Extracted from updated PDF resume section 'Database Pipelines'", "Automated SQL ETL script detection"]),
+                status="PENDING"
+            )
+            db.add_all([s1, s2])
 
     db.commit()

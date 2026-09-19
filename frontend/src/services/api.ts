@@ -251,34 +251,9 @@ export const api = {
       const res = await fetch(`${API_BASE}/sync/updates/${id}`, { headers: getHeaders() });
       if (res.ok) return await res.json();
     } catch (e) {
-      console.warn("Using offline fallback data for sync updates");
+      console.warn("Using offline fallback data for sync updates", e);
     }
-    return [
-      {
-        id: 101,
-        employee_id: 1,
-        source: "GitHub",
-        detected_type: "skill",
-        update_title: "Skill: XGBoost",
-        update_details: { skill_name: "XGBoost", category: "AI/ML" },
-        confidence: 94.0,
-        evidence: ["XGBoost classifier used in Fraud Detection System repository"],
-        status: "PENDING",
-        created_at: new Date().toISOString()
-      },
-      {
-        id: 102,
-        employee_id: 1,
-        source: "Resume",
-        detected_type: "skill",
-        update_title: "Skill: Data Engineering",
-        update_details: { skill_name: "Data Engineering", category: "Data" },
-        confidence: 87.0,
-        evidence: ["Extracted from updated PDF resume section 'Database Pipelines'"],
-        status: "PENDING",
-        created_at: new Date().toISOString()
-      }
-    ];
+    return [];
   },
 
   async simulateFridayCommit(id: number = 1): Promise<TalentSyncUpdate[]> {
@@ -286,28 +261,31 @@ export const api = {
       const res = await fetch(`${API_BASE}/sync/simulate-friday-commit/${id}`, { method: 'POST', headers: getHeaders() });
       if (res.ok) return await res.json();
     } catch (e) {}
-    return [
-      { id: 201, employee_id: 1, source: "GitHub", detected_type: "skill", update_title: "Skill: Recommendation Systems", update_details: {}, confidence: 95, evidence: ["Created repository ai-recommendation-system"], status: "PENDING", created_at: new Date().toISOString() },
-      { id: 202, employee_id: 1, source: "GitHub", detected_type: "skill", update_title: "Skill: Scikit-learn", update_details: {}, confidence: 92, evidence: ["Scikit-learn algorithms and metrics detected"], status: "PENDING", created_at: new Date().toISOString() },
-      { id: 203, employee_id: 1, source: "GitHub", detected_type: "skill", update_title: "Skill: Model Evaluation", update_details: {}, confidence: 89, evidence: ["Precision/Recall and ROC-AUC evaluation scripts"], status: "PENDING", created_at: new Date().toISOString() },
-      { id: 204, employee_id: 1, source: "GitHub", detected_type: "project", update_title: "Project: AI Recommendation System", update_details: {}, confidence: 98, evidence: ["14 commits in active repository"], status: "PENDING", created_at: new Date().toISOString() }
-    ];
+    return [];
   },
 
   async processSyncReview(updateId: number, approved: boolean): Promise<boolean> {
     try {
       const res = await fetch(`${API_BASE}/sync/review/${updateId}?approved=${approved}`, { method: 'POST', headers: getHeaders() });
       if (res.ok) return true;
-    } catch (e) {}
-    return true;
+      console.error(`Sync review failed for update ${updateId} with status ${res.status}`);
+      return false;
+    } catch (e) {
+      console.error("Sync review exception:", e);
+      return false;
+    }
   },
 
   async processApproveAll(id: number = 1): Promise<boolean> {
     try {
       const res = await fetch(`${API_BASE}/sync/review-all/${id}?approved=true`, { method: 'POST', headers: getHeaders() });
       if (res.ok) return true;
-    } catch (e) {}
-    return true;
+      console.error(`Approve all failed for employee ${id} with status ${res.status}`);
+      return false;
+    } catch (e) {
+      console.error("Approve all exception:", e);
+      return false;
+    }
   },
 
   async queryCopilot(employeeId: number, query: string, targetRole?: string) {

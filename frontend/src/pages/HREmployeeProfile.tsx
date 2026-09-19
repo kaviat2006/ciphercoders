@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { User, Sparkles, ShieldCheck, Code, Award, FileText } from 'lucide-react';
 import { SkillBadge } from '../components/SkillBadge';
+import { API_BASE } from '../services/api';
 
 export const HREmployeeProfile: React.FC = () => {
   const { profile } = useApp();
@@ -11,7 +12,7 @@ export const HREmployeeProfile: React.FC = () => {
   const handleGenerateSummary = async () => {
     setLoadingSummary(true);
     try {
-      const res = await fetch(`/api/hr/talent-summary/${profile?.id || 1}`, { method: 'POST' });
+      const res = await fetch(`${API_BASE}/hr/talent-summary/${profile?.id || 1}`, { method: 'POST' });
       if (res.ok) {
         const data = await res.json();
         setTalentSummary(data.talent_summary);

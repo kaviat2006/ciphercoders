@@ -14,6 +14,7 @@ import {
   Building2
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { API_BASE } from '../services/api';
 
 export const OnboardingWizard: React.FC = () => {
   const navigate = useNavigate();
@@ -64,7 +65,7 @@ export const OnboardingWizard: React.FC = () => {
 
   const handleFinish = async () => {
     try {
-      await fetch('/api/auth/register-employee', {
+      await fetch(`${API_BASE}/auth/register-employee`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

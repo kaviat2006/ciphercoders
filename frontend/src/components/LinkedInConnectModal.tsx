@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Linkedin, X, CheckCircle2, AlertTriangle, RefreshCw, Sparkles } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { API_BASE } from '../services/api';
 
 interface LinkedInConnectModalProps {
   onClose: () => void;
@@ -15,7 +16,7 @@ export const LinkedInConnectModal: React.FC<LinkedInConnectModalProps> = ({ onCl
   const handleConnectDemo = async () => {
     setIsConnecting(true);
     try {
-      await fetch(`/api/auth/linkedin/demo-connect?employee_id=${activeEmployeeId}`, { method: 'POST' });
+      await fetch(`${API_BASE}/auth/linkedin/demo-connect?employee_id=${activeEmployeeId}`, { method: 'POST' });
       await refreshData();
       setConnected(true);
     } catch (e) {}

@@ -1,4 +1,22 @@
-const API_BASE = import.meta.env.VITE_API_BASE_URL || '/api';
+const getApiBase = () => {
+  const envUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL;
+  if (envUrl) {
+    const cleaned = envUrl.replace(/\/+$/, '');
+    return cleaned.endsWith('/api') ? cleaned : `${cleaned}/api`;
+  }
+  return '/api';
+};
+
+export const API_BASE = getApiBase();
+
+const getHeaders = (extraHeaders: Record<string, string> = {}) => {
+  const token = localStorage.getItem('talentflow_token');
+  const headers: Record<string, string> = { ...extraHeaders };
+  if (token && token !== 'demo_token') {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  return headers;
+};
 
 export interface SkillItem {
   id: number;
@@ -109,11 +127,11 @@ export interface RoadmapStep {
   status: 'TODO' | 'IN_PROGRESS' | 'COMPLETED';
 }
 
-// Fallback demo dataset
+// Fallback demo dataset for offline fallback
 export const DEMO_PRIYA: EmployeeProfile = {
   id: 1,
   name: "Priya Sharma",
-  email: "priya.sharma@talentflow.ai",
+  email: "employee@talentflow.demo",
   current_role: "Software Developer",
   department: "Software Engineering",
   experience_years: 2.0,
@@ -148,7 +166,7 @@ export const DEMO_PRIYA: EmployeeProfile = {
 export const api = {
   async getEmployeeProfile(id: number = 1): Promise<EmployeeProfile> {
     try {
-      const res = await fetch(`${API_BASE}/profile/${id}`);
+      const res = await fetch(`${API_BASE}/profile/${id}`, { headers: getHeaders() });
       if (res.ok) return await res.json();
     } catch (e) {
       console.warn("Using offline fallback data for profile");
@@ -158,7 +176,7 @@ export const api = {
 
   async getMatches(id: number = 1): Promise<MatchResult[]> {
     try {
-      const res = await fetch(`${API_BASE}/matching/matches/${id}`);
+      const res = await fetch(`${API_BASE}/matching/matches/${id}`, { headers: getHeaders() });
       if (res.ok) return await res.json();
     } catch (e) {
       console.warn("Using offline fallback data for matches");
@@ -230,7 +248,7 @@ export const api = {
 
   async getSyncUpdates(id: number = 1): Promise<TalentSyncUpdate[]> {
     try {
-      const res = await fetch(`${API_BASE}/sync/updates/${id}`);
+      const res = await fetch(`${API_BASE}/sync/updates/${id}`, { headers: getHeaders() });
       if (res.ok) return await res.json();
     } catch (e) {
       console.warn("Using offline fallback data for sync updates");
@@ -265,7 +283,7 @@ export const api = {
 
   async simulateFridayCommit(id: number = 1): Promise<TalentSyncUpdate[]> {
     try {
-      const res = await fetch(`${API_BASE}/sync/simulate-friday-commit/${id}`, { method: 'POST' });
+      const res = await fetch(`${API_BASE}/sync/simulate-friday-commit/${id}`, { method: 'POST', headers: getHeaders() });
       if (res.ok) return await res.json();
     } catch (e) {}
     return [
@@ -278,7 +296,7 @@ export const api = {
 
   async processSyncReview(updateId: number, approved: boolean): Promise<boolean> {
     try {
-      const res = await fetch(`${API_BASE}/sync/review/${updateId}?approved=${approved}`, { method: 'POST' });
+      const res = await fetch(`${API_BASE}/sync/review/${updateId}?approved=${approved}`, { method: 'POST', headers: getHeaders() });
       if (res.ok) return true;
     } catch (e) {}
     return true;
@@ -286,7 +304,7 @@ export const api = {
 
   async processApproveAll(id: number = 1): Promise<boolean> {
     try {
-      const res = await fetch(`${API_BASE}/sync/review-all/${id}?approved=true`, { method: 'POST' });
+      const res = await fetch(`${API_BASE}/sync/review-all/${id}?approved=true`, { method: 'POST', headers: getHeaders() });
       if (res.ok) return true;
     } catch (e) {}
     return true;
@@ -296,7 +314,7 @@ export const api = {
     try {
       const res = await fetch(`${API_BASE}/copilot/query`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({ employee_id: employeeId, query, target_role: targetRole })
       });
       if (res.ok) return await res.json();

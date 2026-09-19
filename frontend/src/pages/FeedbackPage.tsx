@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { MessageSquare, ThumbsUp, ThumbsDown, CheckCircle2, Sparkles } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { API_BASE } from '../services/api';
 
 export const FeedbackPage: React.FC = () => {
   const { activeEmployeeId } = useApp();
@@ -13,7 +14,7 @@ export const FeedbackPage: React.FC = () => {
     if (useful === null) return;
 
     try {
-      await fetch('/api/feedback/submit', {
+      await fetch(`${API_BASE}/feedback/submit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

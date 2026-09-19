@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, UserPlus, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { API_BASE } from '../services/api';
 
 interface HRAddEmployeeModalProps {
   onClose: () => void;
@@ -22,7 +23,7 @@ export const HRAddEmployeeModal: React.FC<HRAddEmployeeModalProps> = ({ onClose 
     setLoading(true);
 
     try {
-      const res = await fetch('/api/hr/add-employee', {
+      const res = await fetch(`${API_BASE}/hr/add-employee`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

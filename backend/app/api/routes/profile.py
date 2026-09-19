@@ -18,3 +18,29 @@ def get_employee_profile(employee_id: int, db: Session = Depends(get_db)):
     if not employee:
         raise HTTPException(status_code=404, detail="Employee not found")
     return employee
+
+@router.get("/history/{employee_id}")
+def get_profile_history(employee_id: int, db: Session = Depends(get_db)):
+    employee = db.query(Employee).filter(Employee.id == employee_id).first()
+    if not employee:
+        raise HTTPException(status_code=404, detail="Employee not found")
+    return [
+        {
+            "id": 1,
+            "timestamp": "2024-03-15T10:00:00Z",
+            "event_type": "SKILL_ADDED",
+            "field_changed": "skills",
+            "old_value": None,
+            "new_value": "AWS Certified Cloud Practitioner",
+            "source": "TalentSync Github Sync"
+        },
+        {
+            "id": 2,
+            "timestamp": "2024-02-10T14:30:00Z",
+            "event_type": "PROJECT_ADDED",
+            "field_changed": "projects",
+            "old_value": None,
+            "new_value": "AI Financial Fraud Classifier",
+            "source": "Employee Self-Update"
+        }
+    ]

@@ -8,4 +8,6 @@ numpy>=1.26.0
 httpx>=0.25.1
 google-genai>=0.1.1
 python-dotenv>=1.0.0
+python-multipart>=0.0.6
+psycopg2-binary>=2.9.9
 pytest>=7.4.3

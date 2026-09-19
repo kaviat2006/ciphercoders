@@ -4,6 +4,8 @@ from sqlalchemy.orm import sessionmaker
 import os
 
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./talentflow.db")
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
 # SQLite specific config
 connect_args = {"check_same_thread": False} if "sqlite" in DATABASE_URL else {}

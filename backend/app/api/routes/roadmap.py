@@ -8,10 +8,14 @@ from app.schemas.pydantic_models import RoadmapNodeOut
 router = APIRouter(prefix="/roadmap", tags=["Career Roadmap"])
 
 @router.get("/{employee_id}", response_model=List[RoadmapNodeOut])
+@router.get("/career-path/{employee_id}")
 def get_roadmap_nodes(employee_id: int, db: Session = Depends(get_db)):
-    return db.query(CareerRoadmapNode).filter(
+    nodes = db.query(CareerRoadmapNode).filter(
         CareerRoadmapNode.employee_id == employee_id
     ).order_by(CareerRoadmapNode.step_order.asc()).all()
+    if isinstance(nodes, list):
+        return nodes
+    return []
 
 @router.post("/step/{node_id}/toggle")
 def toggle_roadmap_step(node_id: int, db: Session = Depends(get_db)):

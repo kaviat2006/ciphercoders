@@ -60,3 +60,21 @@ def get_team_matches(employee_id: int, db: Session = Depends(get_db)):
         {"name": "Core Backend Platform", "department": "Platform", "required_skills": ["Java", "Spring Boot", "PostgreSQL"], "score": 72, "matched_skills": ["Java", "SQL"], "reason": "Strong backend programming foundation with relational database mastery."}
     ]
     return teams
+
+@router.get("/skill-gaps/{employee_id}")
+def get_skill_gaps(employee_id: int, db: Session = Depends(get_db)):
+    employee = db.query(Employee).filter(Employee.id == employee_id).first()
+    if not employee:
+        raise HTTPException(status_code=404, detail="Employee not found")
+
+    matches = get_employee_opportunity_matches(employee_id, db)
+    skill_gaps = []
+    for match in matches:
+        for sk in match.missing_skills:
+            skill_gaps.append({
+                "target_opportunity": match.opportunity.title,
+                "missing_skill": sk,
+                "importance": "High" if match.match_score > 70 else "Medium",
+                "recommended_action": f"Complete online module or certification for {sk}"
+            })
+    return skill_gaps

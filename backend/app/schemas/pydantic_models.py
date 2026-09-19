@@ -128,7 +128,8 @@ class RoadmapNodeOut(BaseModel):
 
 class CopilotQueryRequest(BaseModel):
     employee_id: int
-    query: str
+    query: Optional[str] = None
+    message: Optional[str] = None
     target_role: Optional[str] = None
 
 class CopilotQueryResponse(BaseModel):
